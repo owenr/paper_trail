@@ -5,7 +5,7 @@ module PaperTrail
     extend ::ActiveSupport::Concern
 
     included do
-      belongs_to :item, :polymorphic => true
+      belongs_to :item, :polymorphic => true, :required => false
 
       # Since the test suite has test coverage for this, we want to declare
       # the association when the test suite is running. This makes it pass when

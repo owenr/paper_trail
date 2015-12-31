@@ -15,7 +15,8 @@ None
 
 ### Fixed
 
-None
+- [#682](https://github.com/airblade/paper_trail/issues/682) -
+  Explicitly make PaperTrail::Version item relationship optional (to allow after_destroy versioning)
 
 ## 4.1.0 (Unreleased)
 
