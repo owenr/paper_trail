@@ -1,5 +1,6 @@
 language: ruby
 rvm:
+  - 2.2.2
   - 2.0.0
   - 1.9.3
   - jruby-19mode
@@ -26,6 +27,7 @@ before_script:
 gemfile:
   - Gemfile
   - gemfiles/3.0.gemfile
+  - gemfiles/5.0.gemfile
 
 matrix:
   fast_finish: true
