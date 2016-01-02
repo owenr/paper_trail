@@ -122,7 +122,7 @@ class AssociationsTest < ActiveSupport::TestCase
 
           should 'not persist changes to the live association' do
             if @widget.wotsit.respond_to?(:reload)
-              expect { @widget.wotsit.reload }.to raise_error(ActiveRecord::RecordNotFound)
+              assert_raise(ActiveRecord::RecordNotFound) { @widget.wotsit.reload }
             else
               assert_nil @widget.wotsit(true)
             end
