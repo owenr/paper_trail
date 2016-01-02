@@ -87,7 +87,11 @@ class AssociationsTest < ActiveSupport::TestCase
           end
 
           should 'not persist changes to the live association' do
-            assert_equal 'wotsit_3', @widget.wotsit(true).name
+            if @widget.wotsit.respond_to?(:reload)
+              assert_equal 'wotsit_3', @widget.wotsit.reload.name
+            else
+              assert_equal 'wotsit_3', @widget.wotsit(true).name
+            end
           end
         end
 
@@ -113,7 +117,11 @@ class AssociationsTest < ActiveSupport::TestCase
           end
 
           should 'not persist changes to the live association' do
-            assert_nil @widget.wotsit(true)
+            if @widget.wotsit.respond_to?(:reload)
+              assert_nil @widget.wotsit.reload
+            else
+              assert_nil @widget.wotsit(true)
+            end
           end
         end
 
