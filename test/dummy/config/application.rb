@@ -51,8 +51,8 @@ module Dummy
     # parameters by using an attr_accessible or attr_protected declaration.
     config.active_record.whitelist_attributes = false if ::PaperTrail.active_record_protected_attributes?
 
-    # Enable the asset pipeline
-    config.assets.enabled = false
+    # Disable the asset pipeline
+    config.assets.enabled = false if config.respond_to? :assets
 
     # Version of your assets, change this if you want to expire all your assets
     # config.assets.version = '1.0'
