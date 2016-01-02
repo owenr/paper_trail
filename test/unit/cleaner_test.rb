@@ -56,7 +56,11 @@ class PaperTrailCleanerTest < ActiveSupport::TestCase
         assert_equal 3, @animal.versions_between(@date, @date + 1.day).size
         PaperTrail.clean_versions!(:date => @date)
         assert_equal 8, PaperTrail::Version.count
-        assert_equal 2, @animal.versions(true).size
+        if @animal.versions.respond_to? :reload
+          assert_equal 2, @animal.versions.reload.size
+        else
+          assert_equal 2, @animal.versions(true).size
+        end
         assert_equal @date, @animal.versions.first.created_at.to_date
         assert_not_same @date, @animal.versions.last.created_at.to_date
       end
@@ -154,7 +158,12 @@ class PaperTrailCleanerTest < ActiveSupport::TestCase
         end
       end
       PaperTrail.timestamp_field = :custom_created_at
-      @animals.map { |a| a.versions(true) } # reload the `versions` association for each animal
+       # reload the `versions` association for each animal
+      if @animals.first.versions.respond_to? :reload
+        @animals.map { |a| a.versions.reload }
+      else
+        @animals.map { |a| a.versions(true) }
+      end
     end
 
     teardown do
