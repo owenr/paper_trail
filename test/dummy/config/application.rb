@@ -66,7 +66,7 @@ module Dummy
     # Set test order for Test::Unit if possible
     config.active_support.test_order = :sorted if config.active_support.respond_to?(:test_order=)
     
-    if config.active_record.respond_to?(:time_zone_aware_types=)
+    if ActiveRecord::VERSION::STRING >= '5.0'
       config.active_record.time_zone_aware_types = [:datetime]
     end
   end
