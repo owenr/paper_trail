@@ -46,7 +46,11 @@ class AssociationsTest < ActiveSupport::TestCase
         end
 
         should 'not persist changes to the live association' do
-          assert_equal @wotsit, @widget.wotsit(true)
+          if @widget.wotsit.respond_to?(:reload)
+            assert_equal @wotsit, @widget.wotsit.reload
+          else
+            assert_equal @wotsit, @widget.wotsit(true)
+          end
         end
       end
     end
@@ -297,7 +301,12 @@ class AssociationsTest < ActiveSupport::TestCase
           end
 
           should 'not persist changes to the live association' do
-            assert_equal ['order_date_0', 'order_date_1'], @customer.orders(true).map(&:order_date).sort
+            if @customer.orders.respond_to?(:reload)
+              live_orders = @customer.orders.reload
+            else
+              live_orders = @customer.orders(true)
+            end
+            assert_equal ['order_date_0', 'order_date_1'], live_orders.map(&:order_date).sort
           end
         end
 
