@@ -15,7 +15,7 @@ group :development, :test do
   gem 'railties', '~> 5.0.0.beta1'
 
   # Testing of Sinatra
-  gem 'sinatra', '~> 1.0'
+  gem 'sinatra', github: 'sinatra/sinatra', branch: '2.2.0-alpha'
   gem 'rack-test', '>= 0.6'
 
   # RSpec testing
