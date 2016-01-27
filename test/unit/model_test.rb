@@ -305,13 +305,13 @@ class HasPaperTrailModelTest < ActiveSupport::TestCase
           should 'not copy the has_one association by default when reifying' do
             reified_widget = @widget.versions.last.reify
             assert_equal @wotsit, reified_widget.wotsit  # association hasn't been affected by reifying
-            assert_equal @wotsit, @widget.wotsit(true)  # confirm that the association is correct
+            assert_equal @wotsit, @widget.reload.wotsit  # confirm that the association is correct
           end
 
           should 'copy the has_one association when reifying with :has_one => true' do
             reified_widget = @widget.versions.last.reify(:has_one => true)
             assert_nil reified_widget.wotsit  # wotsit wasn't there at the last version
-            assert_equal @wotsit, @widget.wotsit(true)  # wotsit should still exist on live object
+            assert_equal @wotsit, @widget.reload.wotsit  # wotsit should still exist on live object
           end
         end
 
@@ -645,17 +645,28 @@ class HasPaperTrailModelTest < ActiveSupport::TestCase
       assert_not_nil @wotsit.versions.last.reify.updated_at
     end
 
+    # Tests that it doesn't try to write created_on as an attribute just because
+    # a created_on method exists.
+    #
+    # - Deprecation warning in Rails 3.2
+    # - ActiveModel::MissingAttributeError in Rails 4
+    #
+    # In rails 5, `capture` is deprecated in favor of `capture_io`.
+    #
     should 'not generate warning' do
-      # Tests that it doesn't try to write created_on as an attribute just because a created_on
-      # method exists.
-      warnings = capture(:stderr) {  # Deprecation warning in Rails 3.2
-        assert_nothing_raised {  # ActiveModel::MissingAttributeError in Rails 4
+      assert_update_raises_nothing = -> {
+        assert_nothing_raised {
           @wotsit.update_attributes! :name => 'changed'
         }
       }
+      warnings =
+        if respond_to?(:capture_io)
+          capture_io { assert_update_raises_nothing.call }.last
+        else
+          capture(:stderr) { assert_update_raises_nothing.call }
+        end
       assert_equal '', warnings
     end
-
   end
 
 
@@ -962,7 +973,7 @@ class HasPaperTrailModelTest < ActiveSupport::TestCase
     should 'store version on join destroy' do
       @book.authors << @dostoyevsky
       count = PaperTrail::Version.count
-      @book.authorships(true).last.destroy
+      @book.authorships.reload.last.destroy
       assert_equal 1, PaperTrail::Version.count - count
       assert_equal @book, PaperTrail::Version.last.reify.book
       assert_equal @dostoyevsky, PaperTrail::Version.last.reify.person
@@ -971,7 +982,7 @@ class HasPaperTrailModelTest < ActiveSupport::TestCase
     should 'store version on join clear' do
       @book.authors << @dostoyevsky
       count = PaperTrail::Version.count
-      @book.authorships(true).destroy_all
+      @book.authorships.reload.destroy_all
       assert_equal 1, PaperTrail::Version.count - count
       assert_equal @book, PaperTrail::Version.last.reify.book
       assert_equal @dostoyevsky, PaperTrail::Version.last.reify.person

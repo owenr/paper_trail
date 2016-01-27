@@ -15,11 +15,15 @@
 
 ### Added
 
-None
+- [#689](https://github.com/airblade/paper_trail/pull/689) -
+  Rails 5 compatibility
 
 ### Fixed
 
-None
+- [#701](https://github.com/airblade/paper_trail/pull/701) /
+  [#699](https://github.com/airblade/paper_trail/issues/699) -
+  Cleaning old versions explicitly preserves the most recent
+  versions instead of relying on database result ordering.
 
 ## 4.1.0 (Unreleased)
 
@@ -37,6 +41,22 @@ None
 ### Fixed
 
 - None
+
+## 4.0.2
+
+### Breaking Changes
+
+- None
+
+### Added
+
+- None
+
+### Fixed
+
+- [#696](https://github.com/airblade/paper_trail/issues/696) /
+  [#697](https://github.com/airblade/paper_trail/pull/697)
+  Bind JSON query parameters in `where_object` and `where_object_changes`.
 
 ## 4.0.1
 

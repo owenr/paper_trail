@@ -20,8 +20,15 @@ Please use our [bug report template][1].
 
 Testing is a little awkward because the test suite:
 
-1. contains a rails app with three databases (test, foo, and bar)
-1. supports three different RDBMS': sqlite, mysql, and postgres
+1. Supports three major versions of rails: 3, 4, 5
+1. Contains a "dummy" rails app with three databases (test, foo, and bar)
+1. Supports three different RDBMS': sqlite, mysql, and postgres
+
+Test against rails 3:
+
+```
+bundle exec appraisal ar3 rake
+```
 
 Run tests with sqlite:
 
@@ -69,12 +76,12 @@ DB=postgres bundle exec rake prepare
 # If this is the first test run ever, create databases.
 # Unlike mysql, use create/migrate instead of setup.
 cd test/dummy
-RAILS_ENV=test bundle exec rake db:create
-RAILS_ENV=test bundle exec rake db:migrate
-RAILS_ENV=foo bundle exec rake db:create
-RAILS_ENV=foo bundle exec rake db:migrate
-RAILS_ENV=bar bundle exec rake db:create
-RAILS_ENV=bar bundle exec rake db:migrate
+DB=postgres RAILS_ENV=test bundle exec rake db:create
+DB=postgres RAILS_ENV=test bundle exec rake db:migrate
+DB=postgres RAILS_ENV=foo bundle exec rake db:create
+DB=postgres RAILS_ENV=foo bundle exec rake db:migrate
+DB=postgres RAILS_ENV=bar bundle exec rake db:create
+DB=postgres RAILS_ENV=bar bundle exec rake db:migrate
 cd ../..
 
 # Run tests

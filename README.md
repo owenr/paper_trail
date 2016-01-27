@@ -39,8 +39,7 @@ has been destroyed.
   - [Storing metadata](#storing-metadata)
 - Extensibility
   - [Custom Version Classes](#custom-version-classes)
-  - [Custom Serializer](#using-a-custom-serializer)
-- [SerializedAttributes support](#serializedattributes-support)
+  - [Custom Serializer](#custom-serializer)
 - [Testing](#testing)
 - [Sinatra](#sinatra)
 
@@ -58,7 +57,7 @@ has been destroyed.
 
 1. Add PaperTrail to your `Gemfile`.
 
-    `gem 'paper_trail', '~> 4.0.0'`
+    `gem 'paper_trail'`
 
 1. Add a `versions` table to your database.
 
@@ -69,19 +68,26 @@ has been destroyed.
 
 1. Add `has_paper_trail` to the models you want to track.
 
+    ```ruby
+    class Widget < ActiveRecord::Base
+      has_paper_trail
+    end
+    ```
+
+1. If your controllers have a `current_user` method, you can easily [track who
+is responsible for changes](#finding-out-who-was-responsible-for-a-change)
+by adding a controller callback.
+
+    ```ruby
+    class ApplicationController
+      before_filter :set_paper_trail_whodunnit
+    end
+    ```
+
 ## Basic Usage
 
-Add `has_paper_trail` to your model to record every `create`, `update`,
-and `destroy`.
-
-```ruby
-class Widget < ActiveRecord::Base
-  has_paper_trail
-end
-```
-
-This gives you a `versions` method which returns the "paper trail" of changes to
-your model.
+Your models now have a `versions` method which returns the "paper trail" of
+changes to your model.
 
 ```ruby
 widget = Widget.find 42
@@ -277,15 +283,22 @@ their order, use the `paper_trail_on_*` methods.
 
 ```ruby
 class Article < ActiveRecord::Base
-  has_paper_trail :on => [] # don't install callbacks yet
-  paper_trail_on_destroy    # install destroy
+
+  # Include PaperTrail, but do not add any callbacks yet. Passing the
+  # empty array to `:on` omits callbacks.
+  has_paper_trail :on => []
+
+  # Add callbacks in the order you need.
+  paper_trail_on_destroy    # add destroy callback
   paper_trail_on_update     # etc.
   paper_trail_on_create
 end
 ```
 
 The `paper_trail_on_destroy` method can be further configured to happen
-`:before` or `:after` the destroy event. By default, it will happen before.
+`:before` or `:after` the destroy event. In PaperTrail 4, the default is
+`:after`. In PaperTrail 5, the default will be `:before`, to support
+ActiveRecord 5. (see https://github.com/airblade/paper_trail/pull/683)
 
 ## Choosing When To Save New Versions
 
@@ -1125,7 +1138,7 @@ Postgres. In databases without such protection, such as MySQL, a table lock may
 be necessary.
 
 If the above technique is too slow for your needs, and you're okay doing without
-PaperTrail data temporarily, you can create the new column without a converting
+PaperTrail data temporarily, you can create the new column without converting
 the data.
 
 ```ruby
@@ -1422,7 +1435,6 @@ end
   [Ilya Bodrov](http://www.sitepoint.com/author/ibodrov), 10th April 2014
 * [Using PaperTrail to track stack traces](http://rubyrailsexpert.com/?p=36),
   T James Corcoran's blog, 1st October 2013.
-* [RailsCast #255 - Undo with Paper Trail][3], Feb 28, 2011
 * [RailsCast #255 - Undo with PaperTrail](http://railscasts.com/episodes/255-undo-with-paper-trail),
   28th February 2011.
 * [Keep a Paper Trail with PaperTrail](http://www.linux-mag.com/id/7528),
@@ -1502,7 +1514,6 @@ Released under the MIT licence.
 
 [1]: http://api.rubyonrails.org/classes/ActiveRecord/Locking/Optimistic.html
 [2]: https://github.com/airblade/paper_trail/issues/163
-[3]: http://railscasts.com/episodes/255-undo-with-paper-trail
 [4]: https://api.travis-ci.org/airblade/paper_trail.svg?branch=master
 [5]: https://travis-ci.org/airblade/paper_trail
 [6]: https://img.shields.io/gemnasium/airblade/paper_trail.svg
